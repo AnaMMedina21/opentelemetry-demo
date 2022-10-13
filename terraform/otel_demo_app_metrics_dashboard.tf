@@ -196,11 +196,100 @@ metric app.recommendations.request.counter
 | group_by [],
 sum
 EOT
+    }
+  }
+  chart {
+    name = "Ads count"
+    rank = "9"
+    type = "timeseries"
 
+    query {
+      query_name         = "a"
+      display             = "line"
+      hidden              = false
+      query_string         = <<EOT
+spans count 
+| delta 
+| filter ((service == "adservice") 
+&& (app.ads.count == 0)) 
+| group_by [], 
+sum
+EOT
+    }
+  }
+  chart {
+    name = "CartService/GetCart [Count]"
+    rank = "10"
+    type = "timeseries"
+
+    query {
+      query_name         = "a"
+      display             = "line"
+      hidden              = false
+      query_string         = <<EOT
+spans count 
+| delta 
+| filter ((service == "frontend") 
+&& (((operation == "grpc.hipstershop.CartService/GetCart") 
+|| (operation == "HTTP GET")) 
+|| (operation == "HTTP POST"))) 
+| group_by [], 
+sum      
+EOT
     }
 
   }
 
+    chart {
+    name = "otlp.exporter.seen"
+    rank = "11"
+    type = "timeseries"
+
+    query {
+      query_name         = "a"
+      display             = "big_number"
+      hidden              = false
+      query_string         = "metric otlp.exporter.seen | delta | group_by [], sum"
+    }
+
+  }
+  chart {
+    name = "runtime.cpython.gc_count"
+    rank = "12"
+    type = "timeseries"
+
+    query {
+      query_name         = "a"
+      display             = "line"
+      hidden              = false
+      query_string         = <<EOT
+metric runtime.cpython.gc_count 
+| rate 
+| group_by [], 
+sum
+EOT
+    }
+  }
+
+    chart {
+    name = "runtime.cpython.memory"
+    rank = "13"
+    type = "timeseries"
+
+    query {
+      query_name         = "a"
+      display             = "line"
+      hidden              = false
+      query_string         = <<EOT
+metric runtime.cpython.memory 
+| rate 
+| group_by [],
+sum     
+EOT
+    }
+
+  }
+  
 }
 
 /* 
