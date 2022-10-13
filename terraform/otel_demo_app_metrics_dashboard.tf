@@ -9,10 +9,10 @@ resource "lightstep_dashboard" "exported_dashboard" {
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string        = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans latency 
 | delta 
 | filter ((((((((((((service == "adservice") 
@@ -34,16 +34,16 @@ EOT
 
   }
 
-   chart {
+  chart {
     name = "Concurrent Requests"
     rank = "1"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
       metric app.recommendations.counter 
       | rate 
       | group_by [], 
@@ -52,16 +52,16 @@ EOT
     }
 
   }
-    chart {
+  chart {
     name = "CPU %"
     rank = "2"
     type = "timeseries"
 
     query {
-      query_name         = "(a * 100)"
-      display             = "area"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "(a * 100)"
+      display      = "area"
+      hidden       = false
+      query_string = <<EOT
 metric runtime.cpython.cpu_time 
 | rate 
 | group_by [], 
@@ -76,10 +76,10 @@ sum
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans count 
 | delta 
 | filter (operation == "grpc.hipstershop.CheckoutService/PlaceOrder") 
@@ -88,16 +88,16 @@ sum
 EOT
     }
   }
-    chart {
+  chart {
     name = "/GetCart latency"
     rank = "4"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
  spans latency 
  | delta 
  | filter ((service == "cartservice") 
@@ -108,17 +108,17 @@ EOT
 EOT
     }
   }
-  
-   chart {
+
+  chart {
     name = "/GetProduct latency"
     rank = "5"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans latency 
 | delta 
 | filter ((service == "productcatalogservice") 
@@ -127,8 +127,8 @@ spans latency
 sum 
 | point percentile(value, 50.0), percentile(value, 95.0), percentile(value, 99.0), percentile(value, 99.9)
 EOT
-}
-}
+    }
+  }
 
   chart {
     name = "Rate per Service"
@@ -136,10 +136,10 @@ EOT
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans count 
 | rate 10m 
 | filter (((((((((((((service == "adservice") 
@@ -161,16 +161,16 @@ EOT
     }
 
   }
-    chart {
+  chart {
     name = "Order Confirmations Sent"
     rank = "7"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans count 
 | delta 
 | filter (operation == "POST /send_order_confirmation") 
@@ -179,17 +179,17 @@ sum
 EOT
     }
   }
-  
-    chart {
+
+  chart {
     name = "app.recommendations.request.counter"
     rank = "8"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "bar"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "bar"
+      hidden       = false
+      query_string = <<EOT
 metric app.recommendations.request.counter 
 | filter (application.name == "otel-demo") 
 | rate 
@@ -204,10 +204,10 @@ EOT
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans count 
 | delta 
 | filter ((service == "adservice") 
@@ -223,10 +223,10 @@ EOT
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 spans count 
 | delta 
 | filter ((service == "frontend") 
@@ -240,16 +240,16 @@ EOT
 
   }
 
-    chart {
+  chart {
     name = "otlp.exporter.seen"
     rank = "11"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "bar"
-      hidden              = false
-      query_string         = "metric otlp.exporter.seen | delta | group_by [], sum"
+      query_name   = "a"
+      display      = "bar"
+      hidden       = false
+      query_string = "metric otlp.exporter.seen | delta | group_by [], sum"
     }
 
   }
@@ -259,10 +259,10 @@ EOT
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 metric runtime.cpython.gc_count 
 | rate 
 | group_by [], 
@@ -271,16 +271,16 @@ EOT
     }
   }
 
-    chart {
+  chart {
     name = "runtime.cpython.memory"
     rank = "13"
     type = "timeseries"
 
     query {
-      query_name         = "a"
-      display             = "line"
-      hidden              = false
-      query_string         = <<EOT
+      query_name   = "a"
+      display      = "line"
+      hidden       = false
+      query_string = <<EOT
 metric runtime.cpython.memory 
 | rate 
 | group_by [],
@@ -289,5 +289,5 @@ EOT
     }
 
   }
-  
+
 }
