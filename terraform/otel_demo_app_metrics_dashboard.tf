@@ -1,7 +1,7 @@
 
-resource "lightstep_metric_dashboard" "exported_dashboard" {
+resource "lightstep_dashboard" "exported_dashboard" {
   project_name   = var.lightstep_project
-  dashboard_name = "oTel Demo App - Application Metrics"
+  dashboard_name = "oTel Demo App - Application Metrics [built via tf]"
 
   chart {
     name = "Latency per Service"
@@ -9,150 +9,126 @@ resource "lightstep_metric_dashboard" "exported_dashboard" {
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      spans {
-         query         = "service IN (\"adservice\", \"cartservice\", \"checkoutservice\", \"currencyservice\", \"emailservice\", \"featureflagservice\", \"frontend\", \"paymentservice\", \"productcatalogservice\", \"quoteservice\", \"recommendationservice\", \"shippingservice\")"
-         operator      = "latency"
-         group_by_keys = ["__component",]
-         latency_percentiles = [50,95,99,99.9,]
-      }
-
+      query_string        = <<EOT
+spans latency 
+| delta 
+| filter ((((((((((((service == "adservice") 
+|| (service == "cartservice")) 
+|| (service == "checkoutservice")) 
+|| (service == "currencyservice")) 
+|| (service == "emailservice")) 
+|| (service == "featureflagservice")) 
+|| (service == "frontend")) 
+|| (service == "paymentservice")) 
+|| (service == "productcatalogservice")) 
+|| (service == "quoteservice")) 
+|| (service == "recommendationservice")) 
+|| (service == "shippingservice")) 
+| group_by ["service"], sum 
+| point percentile(value, 50.0), percentile(value, 95.0), percentile(value, 99.0), percentile(value, 99.9)
+EOT
     }
 
   }
 
-  chart {
+   chart {
     name = "Concurrent Requests"
     rank = "1"
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      metric              = "app.recommendations.counter"
-      timeseries_operator = "rate"
-      
-    /* query {
-      query_name          = "a"
-      display             = "line"
-      hidden              = false
-
-      metric              = "app.products_recommended.request.count"
-      timeseries_operator = "rate"
-
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
-
-    } */
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
-
+      query_string         = <<EOT
+      metric app.recommendations.counter 
+      | rate 
+      | group_by [], 
+      sum
+EOT
     }
 
   }
-
-  chart {
+    chart {
     name = "CPU %"
     rank = "2"
     type = "timeseries"
 
     query {
-      query_name          = "(a * 100)"
+      query_name         = "(a * 100)"
       display             = "area"
       hidden              = false
-
+      query_string         = <<EOT
+metric runtime.cpython.cpu_time 
+| rate 
+| group_by [], 
+sum 
+| point (value * 100)
+  EOT
     }
-
-    query {
-      query_name          = "a"
-      display             = "area"
-      hidden              = false
-
-      metric              = "runtime.cpython.cpu_time"
-      timeseries_operator = "rate"
-
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
-
-    }
-
   }
-
   chart {
     name = "Orders Placed"
     rank = "3"
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      spans {
-         query         = "operation IN (\"grpc.hipstershop.CheckoutService/PlaceOrder\")"
-         operator      = "count"
-         group_by_keys = []
-      }
-
+      query_string         = <<EOT
+spans count 
+| delta 
+| filter (operation == "grpc.hipstershop.CheckoutService/PlaceOrder") 
+| group_by [], 
+sum
+EOT
     }
-
   }
-
-  chart {
+    chart {
     name = "/GetCart latency"
     rank = "4"
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      spans {
-         query         = "service IN (\"cartservice\") AND operation IN (\"hipstershop.CartService/GetCart\")"
-         operator      = "latency"
-         group_by_keys = ["__operation",]
-         latency_percentiles = [50,95,99,99.9,]
-      }
-
+      query_string         = <<EOT
+ spans latency 
+ | delta 
+ | filter ((service == "cartservice") 
+ && (operation == "hipstershop.CartService/GetCart")) 
+ | group_by ["operation"], 
+ sum 
+ | point percentile(value, 50.0), percentile(value, 95.0), percentile(value, 99.0), percentile(value, 99.9)     
+EOT
     }
-
   }
-
-  chart {
+  
+   chart {
     name = "/GetProduct latency"
     rank = "5"
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      spans {
-         query         = "service IN (\"productcatalogservice\") AND operation IN (\"hipstershop.ProductCatalogService/GetProduct\")"
-         operator      = "latency"
-         group_by_keys = ["__operation",]
-         latency_percentiles = [50,95,99,99.9,]
-      }
-
-    }
-
-  }
+      query_string         = <<EOT
+spans latency 
+| delta 
+| filter ((service == "productcatalogservice") 
+&& (operation == "hipstershop.ProductCatalogService/GetProduct")) 
+| group_by ["operation"], 
+sum 
+| point percentile(value, 50.0), percentile(value, 95.0), percentile(value, 99.0), percentile(value, 99.9)
+EOT
+}
+}
 
   chart {
     name = "Rate per Service"
@@ -160,170 +136,75 @@ resource "lightstep_metric_dashboard" "exported_dashboard" {
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      spans {
-         query         = "service IN (\"adservice\", \"cartservice\", \"checkoutservice\", \"currencyservice\", \"emailservice\", \"featureflagservice\", \"frontend\", \"loadgenerator\", \"paymentservice\", \"productcatalogservice\", \"quoteservice\", \"recommendationservice\", \"shippingservice\")"
-         operator      = "rate"
-         group_by_keys = ["__component",]
-      }
-
+      query_string         = <<EOT
+spans count 
+| rate 10m 
+| filter (((((((((((((service == "adservice") 
+|| (service == "cartservice")) 
+|| (service == "checkoutservice")) 
+|| (service == "currencyservice")) 
+|| (service == "emailservice")) 
+|| (service == "featureflagservice")) 
+|| (service == "frontend")) 
+|| (service == "loadgenerator")) 
+|| (service == "paymentservice")) 
+|| (service == "productcatalogservice")) 
+|| (service == "quoteservice")) 
+|| (service == "recommendationservice")) 
+|| (service == "shippingservice")) 
+| group_by ["service"], 
+sum      
+EOT
     }
 
   }
-
-  chart {
+    chart {
     name = "Order Confirmations Sent"
     rank = "7"
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "line"
       hidden              = false
-
-      spans {
-         query         = "operation IN (\"POST /send_order_confirmation\")"
-         operator      = "count"
-         group_by_keys = []
-      }
-
+      query_string         = <<EOT
+spans count 
+| delta 
+| filter (operation == "POST /send_order_confirmation") 
+| group_by [], 
+sum      
+EOT
     }
-
   }
-
-  chart {
+  
+    chart {
     name = "app.recommendations.request.counter"
     rank = "8"
     type = "timeseries"
 
     query {
-      query_name          = "a"
+      query_name         = "a"
       display             = "bar"
       hidden              = false
-
-      metric              = "app.recommendations.request.counter"
-      timeseries_operator = "rate"
-
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
-
-    }
-
-  }
-
-  chart {
-    name = "Ads count"
-    rank = "9"
-    type = "timeseries"
-
-    query {
-      query_name          = "a"
-      display             = "line"
-      hidden              = false
-
-      spans {
-         query         = "service IN (\"adservice\") AND \"app.ads.count\" IN (\"0\")"
-         operator      = "count"
-         group_by_keys = []
-      }
-
-    }
-
-  }
-
-  chart {
-    name = "CartService/GetCart [Count]"
-    rank = "10"
-    type = "timeseries"
-
-    query {
-      query_name          = "a"
-      display             = "line"
-      hidden              = false
-
-      spans {
-         query         = "service IN (\"frontend\") AND operation IN (\"grpc.hipstershop.CartService/GetCart\", \"HTTP GET\", \"HTTP POST\")"
-         operator      = "count"
-         group_by_keys = []
-      }
-
-    }
-
-  }
-
-  chart {
-    name = "otlp.exporter.seen"
-    rank = "11"
-    type = "timeseries"
-
-    query {
-      query_name          = "a"
-      display             = "big_number"
-      hidden              = false
-
-      metric              = "otlp.exporter.seen"
-      timeseries_operator = "delta"
-
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
-
-    }
-
-  }
-
-  chart {
-    name = "runtime.cpython.gc_count"
-    rank = "12"
-    type = "timeseries"
-
-    query {
-      query_name          = "a"
-      display             = "line"
-      hidden              = false
-
-      metric              = "runtime.cpython.gc_count"
-      timeseries_operator = "rate"
-
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
-
-    }
-
-  }
-
-  chart {
-    name = "runtime.cpython.memory"
-    rank = "13"
-    type = "timeseries"
-
-    query {
-      query_name          = "a"
-      display             = "line"
-      hidden              = false
-
-      metric              = "runtime.cpython.memory"
-      timeseries_operator = "rate"
-
-
-      group_by {
-        aggregation_method = "sum"
-        keys = []
-      }
+      query_string         = <<EOT
+metric app.recommendations.request.counter 
+| filter (application.name == "otel-demo") 
+| rate 
+| group_by [],
+sum
+EOT
 
     }
 
   }
 
 }
+
+/* 
+
+      query_string         = <<EOT
+EOT
+    } */
