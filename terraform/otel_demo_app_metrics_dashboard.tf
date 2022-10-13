@@ -247,7 +247,7 @@ EOT
 
     query {
       query_name         = "a"
-      display             = "big_number"
+      display             = "bar"
       hidden              = false
       query_string         = "metric otlp.exporter.seen | delta | group_by [], sum"
     }
