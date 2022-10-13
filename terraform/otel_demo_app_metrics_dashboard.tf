@@ -291,9 +291,3 @@ EOT
   }
   
 }
-
-/* 
-
-      query_string         = <<EOT
-EOT
-    } */
